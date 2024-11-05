@@ -2,9 +2,8 @@ Create Database InventorySystem;
 
 use InventorySystem;
 
-CREATE TABLE Users (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    Username VARCHAR(50) NOT NULL,
+CREATE TABLE Admins (
+    Username VARCHAR(50) PRIMARY KEY NOT NULL,
     Password VARCHAR(50) NOT NULL
 );
 

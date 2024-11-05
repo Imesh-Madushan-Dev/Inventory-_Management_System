@@ -19,6 +19,8 @@ namespace InventoryManagementSystem
             AutoIncrementProductId();
         }
 
+        // after saving clear text boxes
+
         private void ClearTextBoxes()
         {
             txtProductID.Clear();
@@ -30,6 +32,7 @@ namespace InventoryManagementSystem
 
         String connectionString = "Data Source=DESKTOP-Q4PDC5P\\SQLEXPRESS;Initial Catalog=InventorySystem;Integrated Security=True";
 
+        // Product ID auto increment method 
         private void AutoIncrementProductId()
         {        
               using (SqlConnection conn = new SqlConnection(connectionString))
@@ -43,7 +46,23 @@ namespace InventoryManagementSystem
                     }
                 }
         }
-        private void btnSave_Click(object sender, EventArgs e)
+
+        // Data Table fill wena function eka
+        private void LoadData()
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT ProductID, ProductName, Category, Supplier, UnitPrice, Quantity FROM Products";
+                SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                dgvdata.DataSource = dt;
+            }
+        }
+
+
+        private void btnSave_Click_1(object sender, EventArgs e)
         {
             string productId = txtProductID.Text;
             string productName = txtProductName.Text;
@@ -76,6 +95,7 @@ namespace InventoryManagementSystem
 
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Item saved successfully!");
+                        LoadData();
                     }
                 }
             }
@@ -87,7 +107,7 @@ namespace InventoryManagementSystem
             ClearTextBoxes(); 
             AutoIncrementProductId();
         }
-        private void btnLoad_Click(object sender, EventArgs e)
+        private void btnLoad_Click_1(object sender, EventArgs e)
         {
             string productId = txtProductID.Text;
 
@@ -131,7 +151,7 @@ namespace InventoryManagementSystem
             }
         }
 
-        private void btnUpdate_Click(object sender, EventArgs e)
+        private void btnUpdate_Click_1(object sender, EventArgs e)
         {
             string productId = txtProductID.Text;
             string productName = txtProductName.Text;
@@ -166,6 +186,7 @@ namespace InventoryManagementSystem
                         if (rowsAffected > 0)
                         {
                             MessageBox.Show("Item updated successfully!");
+                            LoadData();
                         }
                         else
                         {
@@ -182,7 +203,7 @@ namespace InventoryManagementSystem
             ClearTextBoxes();
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private void btnDelete_Click_1(object sender, EventArgs e)
         {
             string productId = txtProductID.Text;
 
@@ -220,11 +241,38 @@ namespace InventoryManagementSystem
             }
 
             ClearTextBoxes();
+            LoadData();
         }
 
         private void btnClose_Click_1(object sender, EventArgs e)
         {
             this.Hide();
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        private void txtSearch_TextChange(object sender, EventArgs e)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string searchQuery = "SELECT ProductID, ProductName, Category, Supplier, UnitPrice, Quantity FROM Products " +
+                                     "WHERE ProductID LIKE @Search OR ProductName LIKE @Search OR Category LIKE @Search";
+                SqlCommand cmd = new SqlCommand(searchQuery, conn);
+                cmd.Parameters.AddWithValue("@Search", "%" + txtSearch.Text + "%");
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                dgvdata.DataSource = dt;
+            }
+        }
+
+        private void uc_Manage_Load(object sender, EventArgs e)
+        {
+            LoadData();
         }
 
     }
